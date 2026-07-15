@@ -174,3 +174,25 @@ Results:
 
 Conclusion:
 Model successfully shrunk to 1.58M parameters. At 400 steps of training, it achieved 2.9228 dev bpb. This serves as a control baseline to measure BPE tokenizer improvements.
+
+## Run 8 - BPE Tokenizer (vocab=2000, n_embd=144, 400 Steps Test)
+
+Hypothesis:
+Swapping the ByteTokenizer with a trained BPE tokenizer (vocab=2000) on the `n_embd=144` model will allow the context window to span ~505 bytes of text on average (a 1.97x expansion), giving the model much more context and signal per step, resulting in a significantly lower dev bpb at 400 steps compared to Run 7.
+
+Changes:
+- Swapped ByteTokenizer with trained BPE tokenizer (vocab=2000, trained on 1 MB of corpus).
+- Loaded `bpe_vocab.json` automatically in `tokenizer.py`.
+
+Training:
+- 400 optimizer steps
+- 1,829,376 parameters (strictly under 2M cap)
+- Cosine decay learning rate (peak 1e-3, scaled to 400 steps)
+- batch size 8, block size 256
+
+Results:
+- Dev BPB: 2.4545 (at 400 steps)
+- Train Loss: 3.4567 (at 400 steps)
+
+Conclusion:
+Dev bpb improved dramatically from 2.9228 to 2.4545 (a massive decrease of 0.4683 BPB at step 400!). This confirms BPE is an extremely powerful lever, providing 1.97x more context bytes per token. Predicting out of 2000 tokens is harder (so token-level training loss is higher at 3.4567 vs 2.1360), but because each token covers 1.97 bytes, the converted bits-per-byte score is vastly superior. BPE is our chosen final candidate.
