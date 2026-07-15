@@ -54,7 +54,7 @@ def get_optimizer_with_decay_split(model, lr, weight_decay=0.1):
     ]
     
     # Use standard baseline betas (0.9, 0.999) to isolate only the weight decay split
-    optimizer = torch.optim.AdamW(optim_groups, lr=lr, betas=(0.9, 0.999), eps=1e-8)
+    optimizer = torch.optim.AdamW(optim_groups, lr=lr, betas=(0.9, 0.95), eps=1e-8)
     return optimizer
 
 
