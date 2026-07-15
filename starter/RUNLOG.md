@@ -152,3 +152,25 @@ Results:
 
 Conclusion:
 Dev bpb improved to 2.1984 (our lowest score by far, and a massive 0.1734 reduction over the baseline's 2.3718). The increased model depth and sequence length, supported by our optimized training recipe, successfully maximized representational capacity under the hard parameter and step constraints. This confirms the efficacy of the systematic optimization process.
+
+## Run 7 - Model Dimension Reduction (n_embd=144, ByteTokenizer, 400 Steps Test)
+
+Hypothesis:
+To stay under the 2,000,000 parameter cap when switching to a large BPE tokenizer (vocab=2000), we must reduce model dimensions. Shrinking `n_embd` from 160 to 144 (keeping `ByteTokenizer` for this run) will reduce the parameter count but will slightly degrade performance (dev bpb) at 400 steps compared to a wider model because of reduced model capacity.
+
+Changes:
+- Reduced `n_embd` from 160 to 144 in `model.py` Config.
+- (Keep ByteTokenizer fallback by temporarily renaming vocab file).
+
+Training:
+- 400 optimizer steps
+- 1,578,240 parameters
+- Cosine decay learning rate (peak 1e-3, scaled to 400 steps)
+- batch size 8, block size 256
+
+Results:
+- Dev BPB: 2.9228 (at 400 steps)
+- Train Loss: 2.1360 (at 400 steps)
+
+Conclusion:
+Model successfully shrunk to 1.58M parameters. At 400 steps of training, it achieved 2.9228 dev bpb. This serves as a control baseline to measure BPE tokenizer improvements.
