@@ -84,3 +84,24 @@ Results:
 
 Conclusion:
 Dev bpb degraded from 2.3962 to 2.6100. This is a very valuable finding: because of warmup and cosine decay, the average learning rate throughout training was much lower than the baseline's flat 3e-4. Small models need higher learning rates to learn effectively. A peak LR of 3e-4 was too small when decayed, leading to severe underfitting. We need to increase the peak learning rate in subsequent runs.
+
+## Run 4 - Weight Tying + Cosine LR Schedule + Tuned Peak LR
+
+Hypothesis:
+Increasing the peak learning rate to `1e-3` will prevent the underfitting observed in Run 3 when using a cosine schedule with warmup, leading to a much better dev bpb than both Run 3 and the baseline.
+
+Changes:
+- Increased peak learning rate to `1e-3` (using `train_cosine.py`).
+
+Training:
+- 2000 optimizer steps
+- 1,298,880 parameters
+- Cosine decay learning rate (peak 1e-3)
+- batch size 8, block size 128
+
+Results:
+- Dev BPB: 2.2391
+- Train Loss: 1.5878
+
+Conclusion:
+Dev bpb improved dramatically to 2.2391 (a huge decrease of 0.114 BPB compared to the baseline's 2.3531). This confirms that tuning the peak learning rate upward is critical when using a decaying schedule to prevent underfitting. The model achieves much better final cross-entropy loss and generalizes significantly better.
