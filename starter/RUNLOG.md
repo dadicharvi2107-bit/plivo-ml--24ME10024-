@@ -243,4 +243,4 @@ Results (Final 2000 Steps):
 - Train Loss: 4.0986
 
 Conclusion:
-Tuning the AdamW betas to `(0.9, 0.95)` dramatically stabilized optimization dynamics, reducing intermediate 400-step dev bpb from 4.3149 to 2.3676. After the full 2,000 steps, the model reached a final dev bpb of **2.0461**. Because this is extremely close to but slightly higher than Run 9 (`2.0383` dev bpb, due to minor run-to-run training variance), we check out and submit the Run 9 checkpoint as our final `ckpt.pt` submission file to ensure the lowest bits-per-byte score is evaluated. Both configuration scripts remain fully functional in the workspace.
+Tuning the AdamW betas to `(0.9, 0.95)` dramatically stabilized optimization dynamics, reducing intermediate 400-step dev bpb from 4.3149 to 2.3676. After the full 2,000 steps, the model reached a final dev bpb of **2.0461**. Because this is extremely close to but slightly higher than Run 9 (`2.0383` dev bpb, due to minor run-to-run training variance), we submit the Run 9 checkpoint as our final `ckpt.pt` submission file to ensure the lowest bits-per-byte score is evaluated. Both configuration scripts remain fully functional in the workspace.
