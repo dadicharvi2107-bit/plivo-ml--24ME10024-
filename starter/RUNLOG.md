@@ -105,3 +105,25 @@ Results:
 
 Conclusion:
 Dev bpb improved dramatically to 2.2391 (a huge decrease of 0.114 BPB compared to the baseline's 2.3531). This confirms that tuning the peak learning rate upward is critical when using a decaying schedule to prevent underfitting. The model achieves much better final cross-entropy loss and generalizes significantly better.
+
+## Run 5 - Weight Tying + Cosine LR Schedule + Tuned Peak LR + Weight Decay Split
+
+Hypothesis:
+Splitting weight decay so that 2D weight matrices (MLP layers, projections) get a standard weight decay of `0.1`, while 1D parameters (biases, layer norm weights) and embedding weights get `0.0` weight decay, will regularize the model effectively without underfitting on biases and embeddings.
+
+Changes:
+- Added weight decay split logic in `train_decay.py`.
+- Applied weight decay `0.1` only to 2D parameters with dimensions >= 2, and `0.0` to others.
+
+Training:
+- 2000 optimizer steps
+- 1,298,880 parameters
+- Cosine decay learning rate (peak 1e-3)
+- batch size 8, block size 128
+
+Results:
+- Dev BPB: 2.2382
+- Train Loss: 1.5863
+
+Conclusion:
+Dev bpb improved slightly to 2.2382 (a reduction of 0.0009 compared to Run 4). This confirms that weight decay splitting acts as a minor regularizer that slightly improves generalization.
