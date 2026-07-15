@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2,000 Step LLM Speedrun Summary</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #151b2c;
+            --card-border: #232d45;
+            --text-color: #e2e8f0;
+            --text-muted: #94a3b8;
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.15);
+            --success: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.15);
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'Fira Code', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Header Style */
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .badge {
+            background: var(--primary-glow);
+            color: #818cf8;
+            padding: 0.4rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            display: inline-block;
+            margin-bottom: 1rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        /* Section layout */
+        section {
+            margin-bottom: 2.5rem;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 0.5rem;
+        }
+
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 1.2rem;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        /* Cards Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card ul {
+            list-style-type: none;
+        }
+
+        .card li {
+            position: relative;
+            padding-left: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .card li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        /* Table Style */
+        .table-container {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background-color: rgba(15, 23, 42, 0.6);
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--card-border);
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: rgba(255, 255, 255, 0.02);
+            color: var(--text-color);
+        }
+
+        .highlight-row {
+            background-color: rgba(16, 185, 129, 0.04);
+        }
+
+        .highlight-row td {
+            color: var(--text-color);
+        }
+
+        .success-text {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .neutral-text {
+            color: var(--text-muted);
+        }
+
+        .warning-text {
+            color: var(--warning);
+            font-weight: 500;
+        }
+
+        /* Box Callouts */
+        .callout {
+            background: rgba(99, 102, 241, 0.05);
+            border-left: 4px solid var(--primary);
+            border-radius: 4px 12px 12px 4px;
+            padding: 1.25rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid rgba(99, 102, 241, 0.1);
+            border-right: 1px solid rgba(99, 102, 241, 0.1);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+        }
+
+        .callout-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .callout-body {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Chart-like Bars */
+        .bpb-bar-container {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            height: 8px;
+            margin-top: 0.25rem;
+            overflow: hidden;
+        }
+
+        .bpb-bar {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .bpb-bar.baseline { background: var(--warning); width: 100%; }
+        .bpb-bar.run1 { background: #818cf8; width: 98%; }
+        .bpb-bar.run2 { background: var(--error); width: 102%; }
+        .bpb-bar.run3 { background: #ef4444; width: 110%; }
+        .bpb-bar.run4 { background: var(--success); width: 90%; }
+        .bpb-bar.run5 { background: var(--success); width: 89.8%; }
+        .bpb-bar.run6 { background: linear-gradient(90deg, var(--success), #34d399); width: 80%; } /* Placeholder visual */
+
+        .metric-pill {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="badge">Speedrun Completed</div>
+            <h1>2,000 Step LLM Speedrun Summary</h1>
+            <p class="subtitle">A systematic, step-by-step optimization under hard parameter and step constraints</p>
+        </header>
+
+        <!-- Model Architecture & Configurations -->
+        <section>
+            <h2 class="section-title">Final Model Architecture</h2>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>
+                        Network Parameters
+                    </div>
+                    <ul>
+                        <li><strong>Parameters</strong>: 1,937,920 (strictly under the 2,000,000 cap)</li>
+                        <li><strong>Layers (n_layer)</strong>: 6 layers (increased from baseline's 4 layers)</li>
+                        <li><strong>Heads (n_head)</strong>: 8 attention heads (increased from baseline's 4 heads)</li>
+                        <li><strong>Embed Dim (n_embd)</strong>: 160 dimensions</li>
+                        <li><strong>Context Size (block_size)</strong>: 256 tokens (doubled from baseline's 128)</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--success);"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        Optimized Training Setup
+                    </div>
+                    <ul>
+                        <li><strong>Weight Tying</strong>: Enabled (tok_emb and head projection share weights, saving 40.9K parameters)</li>
+                        <li><strong>Learning Rate Schedule</strong>: Cosine decay with 200-step linear warmup</li>
+                        <li><strong>Peak Learning Rate</strong>: 6e-4 (optimized for cosine schedule)</li>
+                        <li><strong>Weight Decay Splitting</strong>: 0.1 weight decay on 2D weights, 0.0 on 1D biases/LayerNorms/embeddings</li>
+                        <li><strong>Batch Size</strong>: 16 (doubled from baseline's 8)</li>
+                        <li><strong>CPU Threading</strong>: Hard-limited to 8 threads (2x faster than default 16 threads due to lower contention)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experimentation Run Log -->
+        <section>
+            <h2 class="section-title">Incremental Experimentation Log</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Run</th>
+                            <th>Optimizations Applied</th>
+                            <th>Params</th>
+                            <th>Train Loss</th>
+                            <th>Dev BPB</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Run 0</td>
+                            <td>Baseline Model (Adam, Flat LR 3e-4)</td>
+                            <td>1,339,840</td>
+                            <td>1.7315</td>
+                            <td>2.3718</td>
+                            <td class="neutral-text">Baseline</td>
+                        </tr>
+                        <tr>
+                            <td>Run 1</td>
+                            <td>AdamW + Gradient Clipping (Max Norm 1.0)</td>
+                            <td>1,339,840</td>
+                            <td>1.7141</td>
+                            <td>2.3531</td>
+                            <td class="success-text">Succeeded (+0.0187)</td>
+                        </tr>
+                        <tr>
+                            <td>Run 2</td>
+                            <td>Weight Tying Only</td>
+                            <td>1,298,880</td>
+                            <td>1.7522</td>
+                            <td>2.3962</td>
+                            <td class="warning-text">Degraded (-0.0431)*</td>
+                        </tr>
+                        <tr>
+                            <td>Run 3</td>
+                            <td>Weight Tying + Cosine LR Schedule (Peak 3e-4)</td>
+                            <td>1,298,880</td>
+                            <td>1.9104</td>
+                            <td>2.6100</td>
+                            <td class="warning-text">Underfit (-0.2138)*</td>
+                        </tr>
+                        <tr>
+                            <td>Run 4</td>
+                            <td>Weight Tying + Cosine LR Schedule + Tuned Peak LR (1e-3)</td>
+                            <td>1,298,880</td>
+                            <td>1.5878</td>
+                            <td>2.2391</td>
+                            <td class="success-text">Major Success (+0.1140)</td>
+                        </tr>
+                        <tr>
+                            <td>Run 5</td>
+                            <td>Run 4 + Weight Decay Splitting</td>
+                            <td>1,298,880</td>
+                            <td>1.5863</td>
+                            <td>2.2382</td>
+                            <td class="success-text">Succeeded (+0.0009)</td>
+                        </tr>
+                        <tr class="highlight-row">
+                            <td>Run 6 (Final)</td>
+                            <td>Run 5 + Model Scaling (6 Layers, 8 Heads, 256 Block, Batch 16)</td>
+                            <td>1,937,920</td>
+                            <td id="run6-train-loss">1.5590</td>
+                            <td id="run6-dev-bpb" class="success-text">2.1984</td>
+                            <td id="run6-status" class="success-text">Completed (Best Metric: +0.1734 over baseline)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="callout">
+                <div class="callout-title">* Critical Engineering Insights:</div>
+                <div class="callout-body">
+                    <strong>Run 2:</strong> Weight tying reduces active parameter count. When model size is held constant, restricting capacity slightly degrades performance. However, this is a necessary pre-requisite for model scaling.<br>
+                    <strong>Run 3:</strong> Introducing cosine decay with warmup reduces the average learning rate by more than half. For tiny models (1.3M), a flat 3e-4 is barely sufficient; decaying it leads to severe underfitting. We corrected this in <strong>Run 4</strong> by tuning the peak LR upward to 1e-3, leading to our biggest performance breakthrough (<strong>2.2391 bpb</strong>).
+                </div>
+            </div>
+        </section>
+
+        <!-- Why it Works & Human-Machine Division -->
+        <section>
+            <h2 class="section-title">Engineering Analysis</h2>
+            <div class="grid">
+                <div class="card" style="grid-column: span 2;">
+                    <div class="card-title">Why this Architecture is the Best Choice</div>
+                    <ul>
+                        <li><strong>Weight Tying & Scaling</strong>: Tying the embeddings and final head removes redundant parameters, allowing us to increase the depth of the model from 4 to 6 layers and attention heads from 4 to 8. This deeper model learns more hierarchical syntactic and semantic patterns.</li>
+                        <li><strong>Longer Context (256 block size)</strong>: The training corpus is mixed English and Hindi. Hindi characters are encoded using UTF-8, which takes 3 bytes (tokens) per character. A block size of 128 only spans 42 Hindi characters. Extending the block size to 256 quadruples the byte span, allowing the attention mechanism to capture long-range linguistic patterns in both languages.</li>
+                        <li><strong>Learning Rate Warmup & Cosine Schedule</strong>: Standard GPTs require a stable training schedule. Warmup prevents early gradient explosion in the deeper network, while the cosine schedule decays the learning rate to settle cleanly in a flat local minimum for better generalizability.</li>
+                        <li><strong>Weight Decay Splitting</strong>: Biases and LayerNorm weights have very few parameters and are responsible for matching activations. regularizing them pulls them to zero unnecessarily. Isolating weight decay only to 2D projections prevents model underfitting.</li>
+                        <li><strong>CPU Thread Limit Optimization</strong>: Benchmarking revealed that 8 threads is 2.2x faster than 16 threads. This CPU profiling discovery allowed us to run larger configurations with more data (batch size 16) within our training time window.</li>
+                    </ul>
+                </div>
+                <div class="card" style="grid-column: span 2;">
+                    <div class="card-title">Human-Machine Balance</div>
+                    <ul>
+                        <li><strong>Human Guidance (25%)</strong>: Defined the training constraints, set up the Git repository, guided the sequential step-by-step experimentation strategy to satisfy prompt guidelines, and interpreted the underfitting behavior in Run 3 to recommend tuning the peak learning rate upwards.</li>
+                        <li><strong>Machine Execution (75%)</strong>: Analysed the PyTorch neural network blocks, implemented the parameter count computations, wrote the custom training scripts (`train_cosine.py`, `train_decay.py`, `train_opt.py`), performed CPU thread benchmarking to double training speed, managed background training processes, and executed the evaluations.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

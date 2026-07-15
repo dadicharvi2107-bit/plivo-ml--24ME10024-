@@ -127,3 +127,28 @@ Results:
 
 Conclusion:
 Dev bpb improved slightly to 2.2382 (a reduction of 0.0009 compared to Run 4). This confirms that weight decay splitting acts as a minor regularizer that slightly improves generalization.
+
+## Run 6 - Scaled Model (6 Layers, 8 Heads, 256 Block Size, Batch Size 16)
+
+Hypothesis:
+Scaling the model size (using the saved parameter budget from weight tying to increase depth from 4 to 6 layers and attention heads from 4 to 8) and expanding the context window (`block_size = 256`) and batch size (`batch_size = 16`) will allow the model to learn much more complex language patterns and capture longer context dependencies, resulting in our best dev bpb.
+
+Changes:
+- Increased `n_layer = 6`, `n_head = 8` in `model.py` Config (parameter count = 1,937,920).
+- Increased `block_size = 256` in `model.py` Config (context window doubled).
+- Increased `batch_size = 16` in `train_opt.py` command line.
+- Set peak learning rate to `6e-4` (tuned for larger model size under batch size 16).
+- Enabled weight tying, cosine schedule, and weight decay splits.
+
+Training:
+- 2000 optimizer steps
+- 1,937,920 parameters (strictly under the 2M cap)
+- Cosine decay learning rate (peak 6e-4)
+- batch size 16, block size 256
+
+Results:
+- Dev BPB: 2.1984
+- Train Loss: 1.5590
+
+Conclusion:
+Dev bpb improved to 2.1984 (our lowest score by far, and a massive 0.1734 reduction over the baseline's 2.3718). The increased model depth and sequence length, supported by our optimized training recipe, successfully maximized representational capacity under the hard parameter and step constraints. This confirms the efficacy of the systematic optimization process.
