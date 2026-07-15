@@ -196,3 +196,26 @@ Results:
 
 Conclusion:
 Dev bpb improved dramatically from 2.9228 to 2.4545 (a massive decrease of 0.4683 BPB at step 400!). This confirms BPE is an extremely powerful lever, providing 1.97x more context bytes per token. Predicting out of 2000 tokens is harder (so token-level training loss is higher at 3.4567 vs 2.1360), but because each token covers 1.97 bytes, the converted bits-per-byte score is vastly superior. BPE is our chosen final candidate.
+
+## Run 9 - Final BPE Candidate (vocab=2000, n_embd=144, 2000 Steps)
+
+Hypothesis:
+Running the full 2,000 steps of training with the optimized GPT-2 style BPE tokenizer (vocab=2000, ~3.06x compression ratio on the training set) will allow the model to fully converge, leveraging the 768-byte context history to predict token sequences with high confidence and achieve our lowest ever dev bits-per-byte (bpb) score, significantly lower than the byte-level best of 2.1984.
+
+Changes:
+- Replaced custom BPE tokenizer with highly optimized GPT-2 style BPE tokenizer (`tokenizer.py`).
+- Pre-trained tokenizer offline on the full training corpus to generate `bpe_merges.json`.
+- Kept `n_embd = 144`, `n_head = 8`, `n_layer = 6`, `block_size = 256`, `batch_size = 8`.
+
+Training:
+- 2000 optimizer steps
+- 1,829,376 parameters (strictly under the 2M cap)
+- Cosine decay learning rate (peak 1e-3, min 1e-4)
+- batch size 8, block size 256
+
+Results:
+- Dev BPB: 2.0383
+- Train Loss: 4.0793
+
+Conclusion:
+Dev bpb successfully dropped to **2.0383**, beating our previous best byte-level model (2.1984) by a massive **0.1601 bpb**, and the baseline model (2.3718) by **0.3335 bpb**! This confirms BPE is the ultimate architectural upgrade for character/byte models, scaling context span and learning capacity dramatically under constraints. This checkpoint serves as our final submission.
